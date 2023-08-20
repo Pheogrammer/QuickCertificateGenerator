@@ -1,0 +1,12 @@
+.custom-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.preview-image {
+  max-height: 800px;
+  width: auto;
+}

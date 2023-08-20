@@ -9,10 +9,16 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Certificate Generation App</h1>
-      <TemplateUpload onTemplateUpload={handleTemplateUpload} />
-      {/* More components and steps will go here */}
+    <div className="container mt-5">
+      <h1 className="mb-4">Certificate Generation App</h1>
+      <div className="row">
+        <div className="col-md-6">
+          <TemplateUpload onTemplateUpload={handleTemplateUpload} />
+        </div>
+        <div className="col-md-6">
+          {/* Preview or other components */}
+        </div>
+      </div>
     </div>
   );
 };

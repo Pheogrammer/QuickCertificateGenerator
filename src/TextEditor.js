@@ -7,9 +7,6 @@ const TextEditor = ({ backgroundImage }) => {
   const [fontSize, setFontSize] = useState('16px');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
-  const [left, setLeft] = useState(0);
-  const [top, setTop] = useState(0);
-  const [selectedTextIndex, setSelectedTextIndex] = useState(null);
 
   const handleAddText = () => {
     setTextElements([
@@ -20,8 +17,8 @@ const TextEditor = ({ backgroundImage }) => {
         fontSize,
         isBold,
         isItalic,
-        left,
-        top,
+        top: 100,
+        left: 100,
       },
     ]);
     setNewText('');
@@ -39,17 +36,17 @@ const TextEditor = ({ backgroundImage }) => {
   return (
     <div className="text-editor-container">
       <div className="image-container">
-        <img
-          src={backgroundImage}
-          alt="Uploaded Template"
-          style={{ maxWidth: '100%', height: 'auto' }}
-        />
+        {backgroundImage && (
+          <img
+            src={backgroundImage}
+            alt="Uploaded Template"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+        )}
         {textElements.map((text, index) => (
           <div
             key={index}
-            className={`text-element ${
-              index === selectedTextIndex ? 'selected' : ''
-            }`}
+            className={`text-element`}
             style={{
               fontFamily: text.fontFamily,
               fontSize: text.fontSize,
@@ -57,10 +54,10 @@ const TextEditor = ({ backgroundImage }) => {
               fontStyle: text.isItalic ? 'italic' : 'normal',
               top: `${text.top}px`,
               left: `${text.left}px`,
+              position: 'absolute',
             }}
-            onClick={() => setSelectedTextIndex(index)}
             draggable
-            onDrag={(e) => handleTextPositionChange(e, index)}
+            onDragEnd={(e) => handleTextPositionChange(e, index)}
           >
             {text.content}
           </div>

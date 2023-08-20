@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 const TextEditor = ({ backgroundImage }) => {
   const [textElements, setTextElements] = useState([]);
@@ -8,6 +8,8 @@ const TextEditor = ({ backgroundImage }) => {
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [selectedTextIndex, setSelectedTextIndex] = useState(null);
+
+  const canvasRef = useRef(null);
 
   const handleAddText = () => {
     if (selectedTextIndex !== null) {
@@ -53,12 +55,14 @@ const TextEditor = ({ backgroundImage }) => {
   };
 
   const handleTextPositionChange = (e, index) => {
-    setTextElements((prevTextElements) => {
-      const updatedTextElements = [...prevTextElements];
-      updatedTextElements[index].top = e.clientY;
-      updatedTextElements[index].left = e.clientX;
-      return updatedTextElements;
-    });
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+
+    const updatedTextElements = [...textElements];
+    updatedTextElements[index].top = e.clientY - rect.top;
+    updatedTextElements[index].left = e.clientX - rect.left;
+
+    setTextElements(updatedTextElements);
   };
 
   const handleTextClick = (index) => {
@@ -69,6 +73,34 @@ const TextEditor = ({ backgroundImage }) => {
     setIsBold(selectedText.isBold);
     setIsItalic(selectedText.isItalic);
     setSelectedTextIndex(index);
+  };
+
+  const handleDownloadImage = () => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+
+    const image = new Image();
+    image.src = backgroundImage;
+
+    image.onload = () => {
+      canvas.width = image.width;
+      canvas.height = image.height;
+
+      context.drawImage(image, 0, 0);
+
+      textElements.forEach((text) => {
+        context.font = `${text.isBold ? 'bold' : ''} ${
+          text.isItalic ? 'italic' : ''
+        } ${text.fontSize} ${text.fontFamily}`;
+        context.fillStyle = 'black';
+        context.fillText(text.content, text.left, text.top);
+      });
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'edited_image.png';
+      link.click();
+    };
   };
 
   return (
@@ -143,7 +175,9 @@ const TextEditor = ({ backgroundImage }) => {
         <button onClick={handleDeleteText} disabled={selectedTextIndex === null}>
           Delete Text
         </button>
+        <button onClick={handleDownloadImage}>Download Image</button>
       </div>
+      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
     </div>
   );
 };

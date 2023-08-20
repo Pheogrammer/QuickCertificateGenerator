@@ -1,77 +1,106 @@
 import React, { useState } from 'react';
 
 const TextEditor = ({ backgroundImage }) => {
-  const [text, setText] = useState('');
-  const [fontSize, setFontSize] = useState('16px');
+  const [textElements, setTextElements] = useState([]);
+  const [newText, setNewText] = useState('');
   const [fontFamily, setFontFamily] = useState('Arial');
-  const [fontWeight, setFontWeight] = useState('normal');
-  const [fontStyle, setFontStyle] = useState('normal');
-  const [top, setTop] = useState(50); 
-  const [left, setLeft] = useState(50); 
+  const [fontSize, setFontSize] = useState('16px');
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [left, setLeft] = useState(0);
+  const [top, setTop] = useState(0);
+  const [selectedTextIndex, setSelectedTextIndex] = useState(null);
 
-  const handleTextChange = (e) => {
-    setText(e.target.value);
+  const handleAddText = () => {
+    setTextElements([
+      ...textElements,
+      {
+        content: newText,
+        fontFamily,
+        fontSize,
+        isBold,
+        isItalic,
+        left,
+        top,
+      },
+    ]);
+    setNewText('');
   };
 
-  const handleFontSizeChange = (e) => {
-    setFontSize(e.target.value);
-  };
-
-  const handleFontFamilyChange = (e) => {
-    setFontFamily(e.target.value);
-  };
-
-  const handleFontWeightChange = (e) => {
-    setFontWeight(e.target.checked ? 'bold' : 'normal');
-  };
-
-  const handleFontStyleChange = (e) => {
-    setFontStyle(e.target.checked ? 'italic' : 'normal');
-  };
-
-  const handleTextPositionChange = (e) => {
-    setTop(e.clientY);
-    setLeft(e.clientX);
+  const handleTextPositionChange = (e, index) => {
+    setTextElements((prevTextElements) => {
+      const updatedTextElements = [...prevTextElements];
+      updatedTextElements[index].top = e.clientY;
+      updatedTextElements[index].left = e.clientX;
+      return updatedTextElements;
+    });
   };
 
   return (
     <div className="text-editor-container">
-      <div
-        className="background-image"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
-      >
-        <div
-          className="text-box"
-          style={{
-            fontSize,
-            fontFamily,
-            fontWeight,
-            fontStyle,
-            top: `${top}px`,
-            left: `${left}px`,
-          }}
-          draggable="true"
-          onDrag={(e) => handleTextPositionChange(e)}
-        >
-          {text}
-        </div>
+      <div className="image-container">
+        <img
+          src={backgroundImage}
+          alt="Uploaded Template"
+          style={{ maxWidth: '100%', height: 'auto' }}
+        />
+        {textElements.map((text, index) => (
+          <div
+            key={index}
+            className={`text-element ${
+              index === selectedTextIndex ? 'selected' : ''
+            }`}
+            style={{
+              fontFamily: text.fontFamily,
+              fontSize: text.fontSize,
+              fontWeight: text.isBold ? 'bold' : 'normal',
+              fontStyle: text.isItalic ? 'italic' : 'normal',
+              top: `${text.top}px`,
+              left: `${text.left}px`,
+            }}
+            onClick={() => setSelectedTextIndex(index)}
+            draggable
+            onDrag={(e) => handleTextPositionChange(e, index)}
+          >
+            {text.content}
+          </div>
+        ))}
       </div>
       <div className="text-options">
         <label>Text:</label>
-        <input type="text" value={text} onChange={handleTextChange} />
+        <input
+          type="text"
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+        />
         <label>Font Size:</label>
-        <input type="text" value={fontSize} onChange={handleFontSizeChange} />
+        <input
+          type="text"
+          value={fontSize}
+          onChange={(e) => setFontSize(e.target.value)}
+        />
         <label>Font Family:</label>
-        <select value={fontFamily} onChange={handleFontFamilyChange}>
+        <select
+          value={fontFamily}
+          onChange={(e) => setFontFamily(e.target.value)}
+        >
           <option value="Arial">Arial</option>
           <option value="Helvetica">Helvetica</option>
           <option value="Times New Roman">Times New Roman</option>
-          {/* Add more font options */}
         </select>
         <label>Bold:</label>
-        <input type="checkbox" checked={fontWeight === 'bold'} onChange={handleFontWeightChange} />
+        <input
+          type="checkbox"
+          checked={isBold}
+          onChange={(e) => setIsBold(e.target.checked)}
+        />
         <label>Italic:</label>
-        <input type="checkbox" checked={fontStyle === 'italic'} onChange={handleFontStyleChange} />
+        <input
+          type="checkbox"
+          checked={isItalic}
+          onChange={(e) => setIsItalic(e.target.checked)}
+        />
+        <button onClick={handleAddText}>Add Text</button>
       </div>
     </div>
   );

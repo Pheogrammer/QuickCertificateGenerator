@@ -10,19 +10,35 @@ const TextEditor = ({ backgroundImage }) => {
   const [selectedTextIndex, setSelectedTextIndex] = useState(null);
 
   const handleAddText = () => {
-    setTextElements([
-      ...textElements,
-      {
+    if (selectedTextIndex !== null) {
+      const updatedTextElements = [...textElements];
+      updatedTextElements[selectedTextIndex] = {
         content: newText,
         fontFamily,
         fontSize,
         isBold,
         isItalic,
-        top: 100,
-        left: 100,
-      },
-    ]);
-    setNewText('');
+        top: textElements[selectedTextIndex].top,
+        left: textElements[selectedTextIndex].left,
+      };
+      setTextElements(updatedTextElements);
+      setSelectedTextIndex(null);
+      setNewText('');
+    } else {
+      setTextElements([
+        ...textElements,
+        {
+          content: newText,
+          fontFamily,
+          fontSize,
+          isBold,
+          isItalic,
+          top: 100,
+          left: 100,
+        },
+      ]);
+      setNewText('');
+    }
   };
 
   const handleDeleteText = () => {
@@ -32,6 +48,7 @@ const TextEditor = ({ backgroundImage }) => {
       );
       setTextElements(updatedTextElements);
       setSelectedTextIndex(null);
+      setNewText('');
     }
   };
 

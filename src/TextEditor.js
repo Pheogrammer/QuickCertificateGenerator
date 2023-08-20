@@ -7,6 +7,7 @@ const TextEditor = ({ backgroundImage }) => {
   const [fontSize, setFontSize] = useState('16px');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
+  const [selectedTextIndex, setSelectedTextIndex] = useState(null);
 
   const handleAddText = () => {
     setTextElements([
@@ -24,6 +25,16 @@ const TextEditor = ({ backgroundImage }) => {
     setNewText('');
   };
 
+  const handleDeleteText = () => {
+    if (selectedTextIndex !== null) {
+      const updatedTextElements = textElements.filter(
+        (_, index) => index !== selectedTextIndex
+      );
+      setTextElements(updatedTextElements);
+      setSelectedTextIndex(null);
+    }
+  };
+
   const handleTextPositionChange = (e, index) => {
     setTextElements((prevTextElements) => {
       const updatedTextElements = [...prevTextElements];
@@ -31,6 +42,16 @@ const TextEditor = ({ backgroundImage }) => {
       updatedTextElements[index].left = e.clientX;
       return updatedTextElements;
     });
+  };
+
+  const handleTextClick = (index) => {
+    const selectedText = textElements[index];
+    setNewText(selectedText.content);
+    setFontFamily(selectedText.fontFamily);
+    setFontSize(selectedText.fontSize);
+    setIsBold(selectedText.isBold);
+    setIsItalic(selectedText.isItalic);
+    setSelectedTextIndex(index);
   };
 
   return (
@@ -46,7 +67,9 @@ const TextEditor = ({ backgroundImage }) => {
         {textElements.map((text, index) => (
           <div
             key={index}
-            className={`text-element`}
+            className={`text-element ${
+              index === selectedTextIndex ? 'selected' : ''
+            }`}
             style={{
               fontFamily: text.fontFamily,
               fontSize: text.fontSize,
@@ -55,7 +78,9 @@ const TextEditor = ({ backgroundImage }) => {
               top: `${text.top}px`,
               left: `${text.left}px`,
               position: 'absolute',
+              cursor: 'pointer',
             }}
+            onClick={() => handleTextClick(index)}
             draggable
             onDragEnd={(e) => handleTextPositionChange(e, index)}
           >
@@ -98,6 +123,9 @@ const TextEditor = ({ backgroundImage }) => {
           onChange={(e) => setIsItalic(e.target.checked)}
         />
         <button onClick={handleAddText}>Add Text</button>
+        <button onClick={handleDeleteText} disabled={selectedTextIndex === null}>
+          Delete Text
+        </button>
       </div>
     </div>
   );
